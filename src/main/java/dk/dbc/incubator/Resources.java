@@ -1,6 +1,8 @@
 package dk.dbc.incubator;
 
+import com.oracle.truffle.js.scriptengine.GraalJSScriptEngine;
 import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.HostAccess;
 import org.graalvm.polyglot.Value;
 
 import javax.ejb.Stateless;
@@ -31,5 +33,18 @@ public class Resources {
             final Value jsValue = context.eval("js", "'hello world from javascript'");
             return jsValue.asString();
         }
+    }
+
+    @GET
+    @Path("engine")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String forceEngine() {
+        final GraalJSScriptEngine engine = GraalJSScriptEngine.create(null,
+                Context.newBuilder("js")
+                        .allowHostAccess(HostAccess.ALL)
+                        .allowHostClassLookup(s -> true)
+                        .allowAllAccess(true));
+
+        return "forced engine is: " + engine;
     }
 }
